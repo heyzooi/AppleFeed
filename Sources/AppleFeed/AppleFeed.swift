@@ -77,7 +77,7 @@ public class AppleFeed {
             .retry(3)
             .tryMap {
                 guard let httpResponse = $0.response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-                    throw AppleFeedError(error: "Invalid Response!")
+                    throw AppleFeedError(error: "Invalid Response")
                 }
                 return $0.data
             }
