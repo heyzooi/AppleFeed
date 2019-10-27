@@ -53,6 +53,14 @@ public struct AppleFeedError: Error {
     
 }
 
+#if canImport(UIKit)
+import UIKit
+public typealias Image = UIImage
+#elseif canImport(AppKit)
+import AppKit
+public typealias Image = NSImage
+#endif
+
 public class AppleFeed {
 
     public static let shared = AppleFeed()
@@ -82,6 +90,22 @@ public class AppleFeed {
                 return $0.data
             }
             .decode(type: FeedResult.self, decoder: decoder)
+            .receive(on: RunLoop.main)
+            .eraseToAnyPublisher()
+    }
+    
+    public func fetchImage(url: URL) -> AnyPublisher<Image, Error> {
+        return URLSession.shared.dataTaskPublisher(for: url)
+            .retry(3)
+            .tryMap {
+                guard let httpResponse = $0.response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+                    throw AppleFeedError(error: "Invalid Response")
+                }
+                guard let image = Image(data: $0.data) else {
+                    throw AppleFeedError(error: "Invalid Image")
+                }
+                return image
+            }
             .receive(on: RunLoop.main)
             .eraseToAnyPublisher()
     }
