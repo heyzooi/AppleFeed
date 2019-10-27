@@ -77,7 +77,7 @@ final class AppleFeedTests: XCTestCase {
         XCTAssertEqual(feedResultUnwrapped.feed.results.count, 100)
         
         let album = feedResultUnwrapped.feed.results[0]
-        guar308491308491d let url = URL(string: album.artworkUrl100) else {
+        guard let url = URL(string: album.artworkUrl100) else {
             XCTFail("\(album.artworkUrl100) is not a valid URL")
             return
         }
